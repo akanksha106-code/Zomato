@@ -26,6 +26,18 @@ pipeline {
                 sh "docker build -t akankshatech/zomatoapp:1.0 ."
             }
         }
+    stage('Docker Push') {
+    withCredentials([usernamePassword(
+        credentialsId: 'docker-login',
+        usernameVariable: 'dockerhublogin',
+        passwordVariable: 'dockerhubpass'
+    )]) {
+        sh """
+            docker login -u ${dockerhublogin} -p ${dockerhubpass}
+            docker push akankshatech/zomatoapp:latest
+        """
+    }
+}
 
     }
 }
