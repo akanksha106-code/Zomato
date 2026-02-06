@@ -49,7 +49,7 @@ pipeline {
                     secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
                 )]) {
                     dir('terraform-files') {
-                        sh 'sudo chmod 600 zomato-keypair.pem'
+                        sh 'chmod 600 zomato-keypair.pem'
                         sh 'terraform init'
                         sh 'terraform validate'
                         sh 'terraform apply --auto-approve'
