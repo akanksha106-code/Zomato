@@ -1,16 +1,31 @@
-- name : Configure Docker on EC2 Instances
-  hosts : all
+- name: Configure Docker on EC2 Instances
+  hosts: all
   become: true
-  connection : ssh
-  tasks : 
-  - name: updating apt
-    command : sudo yum update
+  connection: ssh
 
-  - name : Install Docker
-    command : sudo yum install docker -y
+  tasks:
 
-  - name : Start Docker Service
-    command : sudo systemctl start docker
+    - name: Update system packages
+      yum:
+        name: "*"
+        state: latest
 
-  - name: Deploy Docker Container
-    command: docker run -itd -p 8084:8081 akankshatech/zomatoapp:1.0
+    - name: Install Docker
+      yum:
+        name: docker
+        state: present
+
+    - name: Start and enable Docker service
+      systemd:
+        name: docker
+        state: started
+        enabled: true
+
+    - name: Deploy Zomato Docker Container
+      docker_container:
+        name: zomatoapp
+        image: akankshatech/zomatoapp:1.0
+        state: started
+        restart_policy: always
+        published_ports:
+          - "8084:8081"
