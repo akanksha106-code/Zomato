@@ -4,6 +4,8 @@ pipeline {
     tools {
         jdk 'JAVA_HOME'
         nodejs 'nodejs'
+        // Only if you installed ansible using Jenkins tool config
+        ansible 'ansible'  
     }
 
     stages {
@@ -34,7 +36,7 @@ pipeline {
                     passwordVariable: 'dockerhubpass'
                 )]) {
                     sh """
-                        docker login -u ${dockerhublogin} -p ${dockerhubpass}
+                        echo ${dockerhubpass} | docker login -u ${dockerhublogin} --password-stdin
                         docker push akankshatech/zomatoapp:latest
                     """
                 }
@@ -43,18 +45,28 @@ pipeline {
 
         stage("Terraform Deploy to AWS") {
             steps {
-                withCredentials([aws(
-                    credentialsId: 'awslogin',
-                    accessKeyVariable: 'AWS_ACCESS_KEY_ID',
-                    secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
-                )]) {
+                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding',
+                                  credentialsId: 'awslogin',
+                                  accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+                                  secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
                     dir('terraform-files') {
-                        sh 'sudo chmod 600 zomato-keypair.pem'
+                        sh 'chmod 600 zomato-keypair.pem'
                         sh 'terraform init'
                         sh 'terraform validate'
                         sh 'terraform apply --auto-approve'
                     }
                 }
+            }
+        }
+
+        stage("Run Ansible Playbook") {
+            steps {
+                ansiblePlaybook(
+                    playbook: 'ansiblebook.yml',
+                    inventory: 'inventory',
+                    installation: 'ansible',
+                    credentialsId: '2221ba55-8140-4edf-830c-9ebf62c978b8'
+                )
             }
         }
 
