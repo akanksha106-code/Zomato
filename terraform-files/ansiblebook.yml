@@ -24,8 +24,8 @@
     - name: Deploy Zomato Docker Container
       docker_container:
         name: zomatoapp
-        image: akankshatech/zomatoapp:1.0
+        image: akankshatech/zomatoapp:latest
         state: started
         restart_policy: always
         published_ports:
-          - "8084:8081"
+          - "8084:3000"
