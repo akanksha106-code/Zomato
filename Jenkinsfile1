@@ -5,10 +5,10 @@ pipeline {
         jdk 'JAVA_HOME'
         nodejs 'nodejs'
     }
-    
+
     stages {
 
-        stage("clean workspace") {
+        stage("Clean Workspace") {
             steps {
                 cleanWs()
             }
@@ -41,19 +41,22 @@ pipeline {
             }
         }
 
-    withCredentials([aws(
-  accessKeyVariable: 'AWS_ACCESS_KEY_ID',
-  credentialsId: 'awslogin',
-  secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
-)]) {
-    dir('terraform-files') {
-        sh 'sudo chmod 600 zomato-keypair.pem'
-        sh 'terraform init'
-        sh 'terraform validate'
-        sh 'terraform apply --auto-approve'
-    }
-}
-
+        stage("Terraform Deploy to AWS") {
+            steps {
+                withCredentials([aws(
+                    credentialsId: 'awslogin',
+                    accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+                    secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
+                )]) {
+                    dir('terraform-files') {
+                        sh 'sudo chmod 600 zomato-keypair.pem'
+                        sh 'terraform init'
+                        sh 'terraform validate'
+                        sh 'terraform apply --auto-approve'
+                    }
+                }
+            }
+        }
 
     }
 }
