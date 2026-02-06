@@ -16,5 +16,16 @@ pipeline {
                 git 'https://github.com/akanksha106-code/Zomato.git'
             }
         }
+    stage("Install NPM Dependencies") {
+            steps {
+                sh "npm install"
+            }
+        }
+     stage ("Build Docker Image") {
+            steps {
+                sh "docker build -t akankshatech/zomatoapp:1.0 ."
+            }
+        }
+
     }
 }
