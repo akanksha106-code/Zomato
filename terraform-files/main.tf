@@ -1,7 +1,7 @@
 resource "aws_instance" "test-server" {
   ami = "ami-0532be01f26a3de55"
   instance_type = "t3.small"
-  key_name = "mykey"
+  key_name = "zomato-keypair"
   vpc_security_group_ids = ["sg-01da398717a940515"]
   connection {
      type = "ssh"
