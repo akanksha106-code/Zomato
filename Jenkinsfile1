@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    triggers {
+        githubPush()
+    }
+
     tools {
         jdk 'JAVA_HOME'
         nodejs 'nodejs'
@@ -47,7 +51,7 @@ pipeline {
 
         stage("Terraform Deploy to AWS") {
             steps {
-                withCredentials([[
+                withCredentials([[ 
                     $class: 'AmazonWebServicesCredentialsBinding',
                     credentialsId: 'awslogin',
                     accessKeyVariable: 'AWS_ACCESS_KEY_ID',
