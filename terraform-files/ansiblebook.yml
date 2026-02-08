@@ -21,11 +21,26 @@
         state: started
         enabled: true
 
+    - name: Install pip
+      yum:
+        name: python3-pip
+        state: present
+
+    - name: Install Docker Python module
+      pip:
+        name: docker
+
+    - name: Pull Zomato Docker image
+      docker_image:
+        name: akankshatech/zomatoapp
+        tag: latest
+        source: pull
+
     - name: Deploy Zomato Docker Container
       docker_container:
-        name: zomatoapp
+        name: zomato
         image: akankshatech/zomatoapp:latest
         state: started
         restart_policy: always
         published_ports:
-          - "8084:3000"
+          - "3000:3000"
